@@ -21,12 +21,12 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-#x64/
-#x86/
+x64/
+x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-#[Bb]in/
+[Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -70,7 +70,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+#*.obj
 *.iobj
 *.pch
 *.pdb
@@ -183,18 +183,18 @@ publish/
 PublishScripts/
 
 # NuGet Packages
-#*.nupkg
+*.nupkg
 # NuGet Symbol Packages
-#*.snupkg
+*.snupkg
 # The packages folder can be ignored because of Package Restore
-#**/[Pp]ackages/*
+**/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
-#!**/[Pp]ackages/build/
+!**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
-#!**/[Pp]ackages/repositories.config
+!**/[Pp]ackages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
-#*.nuget.props
-#*.nuget.targets
+*.nuget.props
+*.nuget.targets
 
 # Microsoft Azure Build Output
 csx/
