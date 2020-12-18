@@ -47,13 +47,5 @@
     <Filter Include="头文件">
       <UniqueIdentifier>{c4317166-107c-42f9-83a7-33be56091a75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="packages">
-      <UniqueIdentifier>{ffbfcf82-4ccb-46b2-8332-ab1de2347662}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config">
-      <Filter>packages</Filter>
-    </None>
   </ItemGroup>
 </Project>
