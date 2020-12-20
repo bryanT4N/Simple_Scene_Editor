@@ -53,7 +53,7 @@ public:
 		float y = 0;
 		if (px >= 0 && pz >= 0)
 			y = HighMap[x + (z * MAP_SIZE)];
-		return y/100+3; ///                              
+		return y/5; ///                              
 	}
 
 	void getNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 &result) {
