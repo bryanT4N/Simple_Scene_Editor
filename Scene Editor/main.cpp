@@ -17,13 +17,13 @@
 //µØÐÎÍ¼
 #include"Terrain.h"
 #include<vector>
-#define MAX_MAP 1000
+#define MAX_MAP 1025
 
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 //const GLuint WIDTH = 1000, HEIGHT = 800;
-glm::vec3 lightPos(1.2f, 10.0f, 2.0f);
+glm::vec3 lightPos(4.2f, 8.0f, 2.0f);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_Bit);
@@ -328,7 +328,7 @@ int main()
 		GLint lightColorLoc = glGetUniformLocation(highshader.ID, "lightColor");
 		GLint lightPosLoc = glGetUniformLocation(highshader.ID, "lightPos");
 		GLint viewPosLoc = glGetUniformLocation(highshader.ID, "viewPos");
-		glUniform3f(objectColorLoc, 0.9f, 0.4f, 0.3f);
+		glUniform3f(objectColorLoc, 0.7f, 0.5f, 0.4f);
 		glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(viewPosLoc, camera.Position.x, camera.Position.y, camera.Position.z);
