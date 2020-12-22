@@ -201,7 +201,7 @@ GLint TextureFromFile(const char* path, string directory)
 	string filename = string(path);
 	filename =filename.substr(filename.find_last_of("\\")+1) ;
 	filename = directory + '\\' + filename;
-	cout << "loading:" << filename << endl;
+	//cout << "loading:" << filename << endl;
 	GLuint textureID;
 	glGenTextures(1, &textureID);
 	int width, height, nrChannels;

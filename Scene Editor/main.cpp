@@ -24,7 +24,7 @@
 #include "stb_image.h"
 //const GLuint WIDTH = 1000, HEIGHT = 800;
 glm::vec3 lightPos(4.2f, 8.0f, 2.0f);
-
+GLuint loadTexture(GLchar* path);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_Bit);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -94,6 +94,10 @@ void processInput(GLFWwindow* win)
 void LoadSkyboxPath(char*& right_path, char*& left_path, char*& top_path, char*& bottom_path, char*& back_path, char*& front_path) {
 	//cout << "Please choose the skybox file directory: \n";
 	string sky_path_str = GetSelectFolderPath_string();
+	if (sky_path_str == "")
+	{
+		sky_path_str = "../assets/skybox/sky5";
+	}
 	string tmp_path;
 	tmp_path = sky_path_str + "\\right.jpg";
 	right_path = String2FilePath(tmp_path);
@@ -112,7 +116,7 @@ void LoadSkyboxPath(char*& right_path, char*& left_path, char*& top_path, char*&
 
 int main()
 {	
-
+	
 	cout << "Please choose the skybox file directory: \n";
 	char* skybox_path[6];
 	LoadSkyboxPath(skybox_path[0], skybox_path[1], skybox_path[2], skybox_path[3], skybox_path[4], skybox_path[5]);
@@ -158,7 +162,8 @@ int main()
 	//Shader ourshader("../assets/shader/1.model_loading.vs", "../assets/shader/1.model_loading.fs");
 	Shader ourshader("../assets/shader/3.3.shader.vs", "../assets/shader/3.3.shader.fs");
 	Shader skyboxshader("../assets/shader/3.3.skyboxshader.vs", "../assets/shader/3.3.skyboxshader.fs");
-	Shader highshader("../assets/shader/3.3.highshade.vs", "../assets/shader/3.3.highshade.fs");
+	//Shader highshader("../assets/shader/3.3.highshade.vs", "../assets/shader/3.3.highshade.fs");
+	Shader highshader("../assets/shader/4.highshade.vs", "../assets/shader/4.highshade.fs");
 
 	//地形图处理
 	ourTerrain.putinVN(HighMap);
@@ -216,11 +221,11 @@ int main()
 	glGenBuffers(1, &highVBO);
 	glBindVertexArray(highVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, highVBO);
-	glBufferData(GL_ARRAY_BUFFER, 6 * ((ourTerrain.vertics).size()) * sizeof(float), highVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 5 * ((ourTerrain.vertics).size()) * sizeof(float), highVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glBindVertexArray(0);
 
 	// Setup skybox VAO
@@ -242,47 +247,16 @@ int main()
 	}
 	GLuint cubemapTexture = loadCubemap(faces);
 
+	string groundTexturePath1 = "C:/Users/15474/Desktop/计图代码/Simple_Scene_Editor-master/assets/texture/1.jpg";
+	string groundTexturePath2 = "C:/Users/15474/Desktop/计图代码/Simple_Scene_Editor-master/assets/texture/3.jpg";
+	GLuint groundTexture1 = loadTexture((GLchar*)groundTexturePath1.c_str());
+	GLuint groundTexture2 = loadTexture((GLchar*)groundTexturePath2.c_str());
+
+
 	//model
 	modelsRender.addShader(&ourshader);
-	/*
-	ModelsRender modelsRender(&ourshader);
-	ModelUnit model1;
-	Model ourModel1((GLchar*)"../assets/models/nanosuit/nanosuit.obj");
-	model1.model = ourModel1;
-	model1.translate = glm::vec3(0.0f, -1.75f, 0.0f);
-	model1.scale = glm::vec3(0.5f, 0.5f, 0.5f);
-	modelsRender.addModel(model1);
-
-	Model ourModel2((GLchar*)"../assets/models/backpack/backpack.obj");
-	model1.model = ourModel2;
-	model1.translate = glm::vec3(3.0f, -1.75f, 0.0f);
-	model1.scale = glm::vec3(0.6f, 0.6f, 0.6f);
-	modelsRender.addModel(model1);
-
-
-	Model ourModel3((GLchar*)"../assets/models/Pug/Pug/pug.obj");
-	model1.model = ourModel3;
-	model1.translate = glm::vec3(-2.0f, -1.75f, 0.0f);
-	model1.scale = glm::vec3(0.9f, 0.9f, 0.9f);
-	modelsRender.addModel(model1);
-	*/
 	
-	//Shader lampShader("C:\\Users\\DELL\\Desktop\\glfw\\3.3.shader_light.vs", "C:\\Users\\DELL\\Desktop\\glfw\\3.3.shader_light.fs");
-
-
-	//Model
-	//Model ourModel1((GLchar*)"C:/Users/15474/Desktop/模型/9186/狗狗/Pug/pug.obj");
-	//Model ourModel1((GLchar*)"C:/Users/15474/Desktop/计图代码/glssk/glssk/webmodel/model_gitar/backpack.obj");
-	//Model ourModel1((GLchar*)"C:/Users/15474/Desktop/模型/nanosuit.obj");
-	//Model ourModel1((GLchar*)"C:/Users/15474/Desktop/模型/9186/Garen.obj");
-
-	//thread  pget(&ModelsRender::getModelFromUser,&modelsRender);
-	//end
-
 	int i = 0, j = 0, k = 0;
-	vector<int>pos;
-	pos.push_back(0);
-	//pos.push_back(2);
 	while (!glfwWindowShouldClose(window))
 	{
 		// Calculate deltatime of current frame
@@ -324,23 +298,20 @@ int main()
 		glm::mat4 model;
 		//projection = glm::perspective(camera.Zoom, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 		//phong光照明
-		GLint objectColorLoc = glGetUniformLocation(highshader.ID, "objectColor");
-		GLint lightColorLoc = glGetUniformLocation(highshader.ID, "lightColor");
-		GLint lightPosLoc = glGetUniformLocation(highshader.ID, "lightPos");
-		GLint viewPosLoc = glGetUniformLocation(highshader.ID, "viewPos");
-		glUniform3f(objectColorLoc, 0.7f, 0.5f, 0.4f);
-		glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);
-		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(viewPosLoc, camera.Position.x, camera.Position.y, camera.Position.z);
-
 		glUniformMatrix4fv(glGetUniformLocation(highshader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(glGetUniformLocation(highshader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(highshader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		// highmap
 		glBindVertexArray(highVAO);
-		//glActiveTexture(GL_TEXTURE0);
-	   // glUniform1i(glGetUniformLocation(highshader.ID, "texture_diffuse1"), 0);
-		//glBindTexture(GL_TEXTURE_2D, cubeTexture);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, groundTexture1);
+		glUniform1i(glGetUniformLocation(highshader.ID, "u_Texture0"), 0);
+		
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, groundTexture2);
+		glUniform1i(glGetUniformLocation(highshader.ID, "u_Texture1"), 1);
+
 		glDrawArrays(GL_TRIANGLES, 0, (ourTerrain.vertics).size());
 		glBindVertexArray(0);
 
@@ -358,6 +329,28 @@ int main()
 	glfwTerminate();
 	return 0;
 
+}
+
+GLuint loadTexture(GLchar* path)//这个是搞普通贴图的
+{
+	//Generate texture ID and load texture data 
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	int width, height, nrChannels;
+	unsigned char* image = stbi_load(path, &width, &height, &nrChannels, 0);
+	// Assign texture to ID
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image);
+	return textureID;
 }
 
 // Loads a cubemap texture from 6 individual texture faces
@@ -424,6 +417,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_Bit) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
+		
 		mouse_button_left_pressed = 1;
 		//鼠标左键按下，开始检测交点并放置模型
 		//string path;
@@ -437,17 +431,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_
 			cout << "[" << hit.x << "," << hit.y << "," << hit.z << "]" << endl;
 			cout << "Please choose the model's obj file: \n";
 			char* model_path = GetSelectFilePath();
-			/*int last_po=0;
-			for (int i = 0; i < model_path_str.length(); i++)
+			if ((string)model_path == "")
 			{
-				if (model_path_str[i] == '\\')
-				{
-					model_path_str[i] = '/';
-					last_po = i;
-				}
-
+				return;
 			}
-			char* model_path = zhuanhuan(model_path_str);*/
 			
 			Model ourModel1((GLchar*)model_path);
 			model1.model = ourModel1;

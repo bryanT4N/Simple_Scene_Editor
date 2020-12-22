@@ -30,7 +30,7 @@ public:
 
 		int all_size = MAP_SIZE * MAP_SIZE;
 		FILE* fptr=NULL;
-		cout << path << endl;
+		//cout << path << endl;
 		fptr = fopen(path, "r");
 		if (fptr == NULL)
 			return;
@@ -129,7 +129,11 @@ public:
 
 			}
 		}
-		
+			for (int k = 0; k < vertics.size(); k++) {
+				glm::vec2 tmp((vertics[k].x + MAP_SIZE / 2) / MAP_SIZE, (vertics[k].z + MAP_SIZE / 2) / MAP_SIZE);
+				texCoords.push_back(tmp);
+			}
+
 	}
 
 	void normalize(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 v4,
@@ -300,19 +304,17 @@ public:
 	{
 		int i, j,tem;
 		int maxsize = vertics.size();
-		float* res = new float[6 * maxsize];
+		float* res = new float[5 * maxsize];
 		for (i = 0; i < maxsize; i++)
 		{
-			tem = 6 * i;
+			tem = 5 * i;
 			res[tem] = vertics[i].x;
 			res[tem + 1] = vertics[i].y;
 			res[tem + 2] = vertics[i].z;
-			res[tem + 3] = normals[vertics_index[i]].x;
-			res[tem + 4] = normals[vertics_index[i]].y;
-			res[tem + 5] = normals[vertics_index[i]].z;
+			res[tem + 3] = texCoords[i].x;
+			res[tem + 4] = texCoords[i].y;
 		}
 		return res;
-
 	}
 
 	//求地形图交点

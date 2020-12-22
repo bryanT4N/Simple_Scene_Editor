@@ -53,27 +53,10 @@ public:
     {
 		
         // Bind appropriate textures
-        GLuint diffuseNr = 1;
-        GLuint specularNr = 1;
-		GLuint unknown = 1;
         for (GLuint i = 0; i < this->textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
-            // Retrieve texture number (the N in diffuse_textureN)
-           /* stringstream ss;
-            string number;*/
+            glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding   
             string name = this->textures[i].type;
-			//if (name == "texture_diffuse")
-			//	ss << diffuseNr++; // Transfer GLuint to stream
-			//else if (name == "texture_specular")
-			//	ss << specularNr++; // Transfer GLuint to stream
-			//else
-			//	ss << unknown++;
-   //         number = ss.str();
-            // Now set the sampler to the correct texture unit
-            //glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-			//cout << "name:" << name << endl;
-
 				glUniform1i(glGetUniformLocation(shader.ID, name.c_str()), i);
 				// And finally bind the texture
 				glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
@@ -84,11 +67,14 @@ public:
 		GLint lightAmbientLoc = glGetUniformLocation(shader.ID, "light.ambient");
 		GLint lightDiffuseLoc = glGetUniformLocation(shader.ID, "light.diffuse");
 		GLint lightSpecularLoc = glGetUniformLocation(shader.ID, "light.specular");
+		GLint lightPosLoc = glGetUniformLocation(shader.ID, "light.position");
+		
 
 		//shader.setVec3("viewPos", camera.Position);
 		glUniform3f(lightAmbientLoc, 0.2f, 0.2f, 0.2f);
 		glUniform3f(lightDiffuseLoc, 0.5f, 0.5f, 0.5f);
 		glUniform3f(lightSpecularLoc, 1.0f, 1.0f, 1.0f);
+		glUniform3f(lightPosLoc, 200.0f, 100.0f, 200.0f);
 
 
         // Draw mesh
