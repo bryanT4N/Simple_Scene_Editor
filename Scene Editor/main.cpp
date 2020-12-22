@@ -247,8 +247,8 @@ int main()
 	}
 	GLuint cubemapTexture = loadCubemap(faces);
 
-	string groundTexturePath1 = "C:/Users/15474/Desktop/计图代码/Simple_Scene_Editor-master/assets/texture/1.jpg";
-	string groundTexturePath2 = "C:/Users/15474/Desktop/计图代码/Simple_Scene_Editor-master/assets/texture/3.jpg";
+	string groundTexturePath1 = "../assets/texture/1.jpg";
+	string groundTexturePath2 = "../assets/texture/3.jpg";
 	GLuint groundTexture1 = loadTexture((GLchar*)groundTexturePath1.c_str());
 	GLuint groundTexture2 = loadTexture((GLchar*)groundTexturePath2.c_str());
 
