@@ -14,27 +14,28 @@ struct Plant {
 		this->p1 = po3;
 		this->Plant_normal = norm;
 	}
-	glm::vec3 p1,p2,p3,Plant_normal;
+	glm::vec3 p1, p2, p3, Plant_normal;
 };
 
 
 class Terrain
 {
 public:
-	Terrain(const char* path, float *HighMap,int map_size,	float step_size,glm::vec2 backleft)
+	Terrain(const char* path, float* HighMap, int map_size, float step_size, glm::vec2 backleft)
 	{
 		MAP_SIZE = map_size;
 		STEP_SIZE = step_size;
 		BACK = backleft.x;
 		LEFT = backleft.y;
+		HIGH_MAX = 0;
 
 		int all_size = MAP_SIZE * MAP_SIZE;
-		FILE* fptr=NULL;
+		FILE* fptr = NULL;
 		//cout << path << endl;
 		fptr = fopen(path, "r");
 		if (fptr == NULL)
 			return;
-		
+
 		//fread(HighMap, 1, all_size, fptr);
 		for (int i = 0; i < all_size; i++)//从matlab导出的灰度txt文件读入高度图
 		{
@@ -42,21 +43,28 @@ public:
 		}
 		fclose(fptr);
 
-		
+
 
 	}
 
 	float getHeight(float HighMap[], int px, int pz) {
-		int x = px % MAP_SIZE;                                                                
-		int z = pz % MAP_SIZE;                                                             
-                                                       
+		int x = px % MAP_SIZE;
+		int z = pz % MAP_SIZE;
+
 		float y = 0;
 		if (px >= 0 && pz >= 0)
+		{
 			y = HighMap[x + (z * MAP_SIZE)];
-		return y/5; ///                              
+			if (y > HIGH_MAX)
+			{
+				HIGH_MAX = y;
+			}
+		}
+
+		return y / 5; ///                              
 	}
 
-	void getNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 &result) {
+	void getNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3& result) {
 		const GLfloat l1[] = { p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2] };
 		const GLfloat l2[] = { p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2] };
 		//叉乘求法向量
@@ -78,7 +86,7 @@ public:
 
 	void putinVN(float HighMap[])//将顶点信息(和平面法向量)放入向量
 	{
-		int i, j,count=0;
+		int i, j, count = 0;
 		for (i = 0; i < (MAP_SIZE - 1); i++)
 		{
 			for (j = 0; j < (MAP_SIZE - 1); j++)
@@ -89,29 +97,29 @@ public:
 				p1.y = getHeight(HighMap, j, i);
 
 				glm::vec3 p2;
-				p2.x = BACK + (j+1) * STEP_SIZE;
+				p2.x = BACK + (j + 1) * STEP_SIZE;
 				p2.z = LEFT + i * STEP_SIZE;
-				p2.y = getHeight(HighMap, j+1, i);
+				p2.y = getHeight(HighMap, j + 1, i);
 
 				glm::vec3 p3;
 				p3.x = BACK + j * STEP_SIZE;
-				p3.z = LEFT + (i+1) * STEP_SIZE;
-				p3.y = getHeight(HighMap, j, i+1);
+				p3.z = LEFT + (i + 1) * STEP_SIZE;
+				p3.y = getHeight(HighMap, j, i + 1);
 
 				glm::vec3 nor;
 				getNormal(p1, p2, p3, nor);
-				Plant plant1(p1,p2,p3,nor);
-				plants.push_back(plant1);
+				//Plant plant1(p1,p2,p3,nor);
+				//plants.push_back(plant1);
 
 				glm::vec3 p4;
-				p4.x = BACK + (j+1) * STEP_SIZE;
-				p4.z = LEFT + (i+1) * STEP_SIZE;
-				p4.y = getHeight(HighMap, j+1, i+1);
+				p4.x = BACK + (j + 1) * STEP_SIZE;
+				p4.z = LEFT + (i + 1) * STEP_SIZE;
+				p4.y = getHeight(HighMap, j + 1, i + 1);
 
 				//p5=p3;p6=p2
 				getNormal(p4, p3, p2, nor);
-				Plant plant2(p4, p3, p2, nor);
-				plants.push_back(plant2);
+				//Plant plant2(p4, p3, p2, nor);
+				//plants.push_back(plant2);
 				//注意这里得到的是平面法向量，我们需要的是顶点法向量
 				vertics.push_back(p1);
 				vertics.push_back(p2);
@@ -121,23 +129,28 @@ public:
 				vertics.push_back(p2);
 				count = i * MAP_SIZE + j;
 				vertics_index.push_back(count);
-				vertics_index.push_back(count+1);
-				vertics_index.push_back(count+MAP_SIZE);
-				vertics_index.push_back(count+MAP_SIZE+1);
+				vertics_index.push_back(count + 1);
+				vertics_index.push_back(count + MAP_SIZE);
+				vertics_index.push_back(count + MAP_SIZE + 1);
 				vertics_index.push_back(count + MAP_SIZE);
 				vertics_index.push_back(count + 1);
 
 			}
 		}
-			for (int k = 0; k < vertics.size(); k++) {
-				glm::vec2 tmp((vertics[k].x + MAP_SIZE / 2) / MAP_SIZE, (vertics[k].z + MAP_SIZE / 2) / MAP_SIZE);
-				texCoords.push_back(tmp);
-			}
+		int ind;
+		float ind_row, ind_col;
+		for (int k = 0; k < vertics.size(); k++) {
+			ind = vertics_index[k];
+			ind_row = (float)(ind / MAP_SIZE);
+			ind_col = (float)(ind % MAP_SIZE);
+			glm::vec2 tmp(ind_col / MAP_SIZE, ind_row / MAP_SIZE);
+			texCoords.push_back(tmp);
+		}
 
 	}
 
 	void normalize(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 v4,
-		glm::vec3 v5, glm::vec3 v6, glm::vec3 &result) {
+		glm::vec3 v5, glm::vec3 v6, glm::vec3& result) {
 		GLfloat x = v1[0] + v2[0] + v3[0] + v4[0] + v5[0] + v6[0];
 		GLfloat y = v1[1] + v2[1] + v3[1] + v4[1] + v5[1] + v6[1];
 		GLfloat z = v1[2] + v2[2] + v3[2] + v4[2] + v5[2] + v6[2];
@@ -149,26 +162,26 @@ public:
 
 	void putinPointNormal(float HighMap[])//将顶点法向量弄进去
 	{
-		glm::vec3 p1,p2,p3,p4,p5,p6,p7;
-		glm::vec3 nor1, nor2, nor3, nor4, nor5, nor6,nor_res;
+		glm::vec3 p1, p2, p3, p4, p5, p6, p7;
+		glm::vec3 nor1, nor2, nor3, nor4, nor5, nor6, nor_res;
 		int i, j;
 		for (i = 0; i < MAP_SIZE; i++)
 		{
 			for (j = 0; j < MAP_SIZE; j++)
 			{
-				
+
 				p1.x = BACK + j * STEP_SIZE;
 				p1.z = LEFT + i * STEP_SIZE;
 				p1.y = getHeight(HighMap, j, i);
 
 				//非最后一列才有
 				if (j != (MAP_SIZE - 1))
-				{				
+				{
 					p2.x = BACK + (j + 1) * STEP_SIZE;
 					p2.z = LEFT + i * STEP_SIZE;
 					p2.y = getHeight(HighMap, j + 1, i);
 				}
-				
+
 				//非最头行最后一列才有
 				if (i != 0 && j != (MAP_SIZE - 1))
 				{
@@ -176,7 +189,7 @@ public:
 					p3.z = LEFT + (i - 1) * STEP_SIZE;
 					p3.y = getHeight(HighMap, j + 1, i - 1);
 				}
-				
+
 
 				//非最头行才有
 				if (i != 0)
@@ -185,7 +198,7 @@ public:
 					p4.z = LEFT + (i - 1) * STEP_SIZE;
 					p4.y = getHeight(HighMap, j, i - 1);
 				}
-				
+
 				//非第一列才有
 				if (j != 0)
 				{
@@ -193,7 +206,7 @@ public:
 					p5.z = LEFT + i * STEP_SIZE;
 					p5.y = getHeight(HighMap, j - 1, i);
 				}
-				
+
 
 				//非第一列、最后一行 才有
 				if (i != (MAP_SIZE - 1) && j != 0)
@@ -202,7 +215,7 @@ public:
 					p6.z = LEFT + (i + 1) * STEP_SIZE;
 					p6.y = getHeight(HighMap, j - 1, i + 1);
 				}
-				
+
 
 				//非最后一行才有
 				if (i != (MAP_SIZE - 1))
@@ -211,7 +224,7 @@ public:
 					p7.z = LEFT + (i + 1) * STEP_SIZE;
 					p7.y = getHeight(HighMap, j, i + 1);
 				}
-				
+
 				nor1 = nor2 = nor3 = nor4 = nor5 = nor6 = glm::vec3(0, 0, 0);
 				//分类计算法向量
 				if (i == 0)
@@ -221,7 +234,7 @@ public:
 						getNormal(p1, p2, p7, nor6);
 						normals.push_back(nor6);
 					}
-					else if(j==(MAP_SIZE-1))
+					else if (j == (MAP_SIZE - 1))
 					{
 						getNormal(p1, p5, p6, nor4);
 						getNormal(p1, p6, p7, nor5);
@@ -237,7 +250,7 @@ public:
 						normals.push_back(nor_res);
 					}
 				}
-				else if(i==(MAP_SIZE-1))
+				else if (i == (MAP_SIZE - 1))
 				{
 					if (j == 0)
 					{
@@ -295,14 +308,14 @@ public:
 			}
 		}
 
-		
+
 
 	}
-	
-	
+
+
 	float* mergeVN()
 	{
-		int i, j,tem;
+		int i, j, tem;
 		int maxsize = vertics.size();
 		float* res = new float[5 * maxsize];
 		for (i = 0; i < maxsize; i++)
@@ -318,7 +331,7 @@ public:
 	}
 
 	//求地形图交点
-	float getAnyPlaceHeight(float HighMap[],glm::vec3 in_po)
+	float getAnyPlaceHeight(float HighMap[], glm::vec3 in_po)
 	{
 		if (in_po.x <BACK || in_po.x>BACK + MAP_SIZE * STEP_SIZE || in_po.z<LEFT || in_po.z>LEFT + MAP_SIZE * STEP_SIZE)return -1;
 		float in_x = in_po.x;
@@ -331,15 +344,15 @@ public:
 		float clo_z_coor = cloest_z * STEP_SIZE + LEFT;
 
 		glm::vec2 zs(clo_x_coor, clo_z_coor);
-		glm::vec2 ys(clo_x_coor+STEP_SIZE, clo_z_coor);
-		glm::vec2 zx(clo_x_coor, clo_z_coor+ STEP_SIZE);
-		glm::vec2 yx(clo_x_coor+ STEP_SIZE, clo_z_coor+ STEP_SIZE);
+		glm::vec2 ys(clo_x_coor + STEP_SIZE, clo_z_coor);
+		glm::vec2 zx(clo_x_coor, clo_z_coor + STEP_SIZE);
+		glm::vec2 yx(clo_x_coor + STEP_SIZE, clo_z_coor + STEP_SIZE);
 
 		float del_x = in_po.x - zs.x;
 		float del_z = zx.y - in_po.z;
-		float alpha, beta, gama,fa,fb,fc;
-		fa = getHeight(HighMap, cloest_x, cloest_z+1);
-		fc = getHeight(HighMap, cloest_x+1, cloest_z);
+		float alpha, beta, gama, fa, fb, fc;
+		fa = getHeight(HighMap, cloest_x, cloest_z + 1);
+		fc = getHeight(HighMap, cloest_x + 1, cloest_z);
 		if (del_x < del_z)//三角形重心坐标插值得到任意点高度
 		{
 			alpha = (-(in_po.x - zs.x) * (ys.y - zs.y) + (in_po.z - zs.y) * (ys.x - zs.x)) / (-(zx.x - zs.x) * (ys.y - zs.y) + (zx.y - zs.y) * (ys.x - zs.x));
@@ -353,7 +366,7 @@ public:
 			alpha = (-(in_po.x - yx.x) * (ys.y - yx.y) + (in_po.z - yx.y) * (ys.x - yx.x)) / (-(zx.x - yx.x) * (ys.y - yx.y) + (zx.y - yx.y) * (ys.x - yx.x));
 			beta = (-(in_po.x - ys.x) * (zx.y - ys.y) + (in_po.z - ys.y) * (zx.x - ys.x)) / (-(yx.x - ys.x) * (zx.y - ys.y) + (yx.y - ys.y) * (zx.x - ys.x));
 			gama = 1 - alpha - beta;
-			fb = getHeight(HighMap, cloest_x+1, cloest_z+1);
+			fb = getHeight(HighMap, cloest_x + 1, cloest_z + 1);
 			return (alpha * fa + beta * fb + gama * fc);
 		}
 		return -1;
@@ -361,24 +374,26 @@ public:
 	}
 
 
-	bool Intersects(float HighMap[],Ray ray, glm::vec3 &collisionPoint)
+	bool Intersects(float HighMap[], Ray ray, glm::vec3& collisionPoint)
 	{
-		float blockScale=2;
+		float blockScale = 0.5;
+		int count_step = 0;
+		float inc_y = ray.Direction.y;
 		glm::vec3 rayStep = ray.Direction * blockScale;
 		glm::vec3 rayStartPosition = ray.Position;
-
 
 		glm::vec3 lastRayPosition = ray.Position;
 		ray.Position += rayStep;
 		float height = getAnyPlaceHeight(HighMap, ray.Position);
-		while (ray.Position.y > height&& height >= 0)
+
+
+		while ((ray.Position.y > height&& height >= 0) || ((height == -1) && ((inc_y > 0 && ray.Position.y <= HIGH_MAX) || (ray.Position.y >= 0 && inc_y < 0))))
 		{
 			lastRayPosition = ray.Position;
 			ray.Position += rayStep;
-			height = getAnyPlaceHeight(HighMap,ray.Position);
-			
+			height = getAnyPlaceHeight(HighMap, ray.Position);
 		}
-		
+
 		if (height >= 0)
 		{
 			glm::vec3 startPosition = lastRayPosition;
@@ -402,7 +417,7 @@ public:
 
 
 	int MAP_SIZE;
-	float STEP_SIZE;
+	float STEP_SIZE, HIGH_MAX;
 	float BACK, LEFT;
 	std::vector<int> vertics_index;
 	std::vector < glm::vec3 > vertics;//顶点信息
