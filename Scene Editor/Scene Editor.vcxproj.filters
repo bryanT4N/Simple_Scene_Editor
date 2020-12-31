@@ -39,6 +39,9 @@
     <ClInclude Include="..\include\GetSelectFilePath.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\jpegfunc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="源文件">
