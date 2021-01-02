@@ -52,13 +52,15 @@ float mixValue = 0.1f;
 //地形图声明
 glm::vec2 bl(-50, -50);
 float HighMap[MAX_MAP * MAX_MAP];//地形图用的网格信息
-Terrain ourTerrain("../assets/terrain/high.txt", HighMap, MAX_MAP, 0.1, bl);//构造地形图类
+Terrain ourTerrain("../assets/terrain/1.jpg", HighMap, MAX_MAP, 0.1, bl);//构造地形图类
 
 GLuint loadCubemap(vector<const GLchar*> faces);//这个是搞立方体贴图的
 
 //model
 ModelUnit model1;
 ModelsRender modelsRender; 
+
+GLuint cubemapTexture;
 
 void frame_buffer_callback(GLFWwindow* win, int width, int height)
 {
@@ -113,6 +115,18 @@ void LoadSkyboxPath(char*& right_path, char*& left_path, char*& top_path, char*&
 	front_path = String2FilePath(tmp_path);
 }
 
+void loadskybox()
+{
+	cout << "Please choose the skybox file directory: \n";
+	char* skybox_path[6];
+	LoadSkyboxPath(skybox_path[0], skybox_path[1], skybox_path[2], skybox_path[3], skybox_path[4], skybox_path[5]);
+	vector<const GLchar*> faces;
+	/**/
+	for (int i = 0; i < 6; i++) {
+		faces.push_back(skybox_path[i]);
+	}
+	cubemapTexture = loadCubemap(faces);
+}
 
 int main()
 {	
@@ -245,7 +259,7 @@ int main()
 	for (int i = 0; i < 6; i++) {
 		faces.push_back(skybox_path[i]);
 	}
-	GLuint cubemapTexture = loadCubemap(faces);
+	cubemapTexture = loadCubemap(faces);
 
 	string groundTexturePath1 = "../assets/texture/1.jpg";
 	string groundTexturePath2 = "../assets/texture/3.jpg";
@@ -397,6 +411,11 @@ void Do_Movement()
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (keys[GLFW_KEY_L])
+		loadskybox();
+	
+		
+	
 }
 
 // Is called whenever a key is pressed/released via GLFW
