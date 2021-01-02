@@ -1,5 +1,5 @@
 #pragma once
-#pragma comment(lib, "libjpeg\libjpeg.lib")
+#pragma comment(lib, "libjpeg\\libjpeg.lib")
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <setjmp.h>
@@ -16,27 +16,6 @@
 /*  Default Color Space RGB
 *  Color Space Not Returned.   
 */
-
-/* Read jpeg from memory.
-* jpeg memory source, data destination, width, height, number of components
-* (width, height and components are return values provided by function, no need to be provided by user.)
-*/
-bool readJPEG(const std::vector<uint8_t>& jpeg_in_dat, std::vector<uint8_t>& decoded_data_dest, int& decoded_data_width, int& decoded_data_height, int& decoded_data_components)
-{
-    std::string file_name;
-    return readJPEG(jpeg_in_dat, file_name, false, decoded_data_dest, decoded_data_width, decoded_data_height, decoded_data_components);
-}
-
-/* Read jpeg from file.
-* jpeg file path, data destination, width, height, number of components    
-* (width, height and components are return values provided by function, no need to be provided by user.)
-*/
-bool readJPEG(const std::string& jpeg_in_file, std::vector<uint8_t>& decoded_data_dest, int& decoded_data_width, int& decoded_data_height, int& decoded_data_components)
-{
-    std::vector<uint8_t> empty_data;
-    return readJPEG(empty_data, jpeg_in_file, true, decoded_data_dest, decoded_data_width, decoded_data_height, decoded_data_components);
-}
-
 bool readJPEG(const std::vector<uint8_t>& jpeg_in_dat, const std::string& file_name, bool read_file, std::vector<uint8_t>& decoded_data_dest, int& decoded_data_width, int& decoded_data_height, int& decoded_data_components)
 {
     struct jpeg_decompress_struct cinfo;
@@ -115,4 +94,25 @@ bool readJPEG(const std::vector<uint8_t>& jpeg_in_dat, const std::string& file_n
     // done
     return true;
 }
+
+/* Read jpeg from memory.
+* jpeg memory source, data destination, width, height, number of components
+* (width, height and components are return values provided by function, no need to be provided by user.)
+*/
+bool readJPEG(const std::vector<uint8_t>& jpeg_in_dat, std::vector<uint8_t>& decoded_data_dest, int& decoded_data_width, int& decoded_data_height, int& decoded_data_components)
+{
+    std::string file_name;
+    return readJPEG(jpeg_in_dat, file_name, false, decoded_data_dest, decoded_data_width, decoded_data_height, decoded_data_components);
+}
+
+/* Read jpeg from file.
+* jpeg file path, data destination, width, height, number of components    
+* (width, height and components are return values provided by function, no need to be provided by user.)
+*/
+bool readJPEG(const std::string& jpeg_in_file, std::vector<uint8_t>& decoded_data_dest, int& decoded_data_width, int& decoded_data_height, int& decoded_data_components)
+{
+    std::vector<uint8_t> empty_data;
+    return readJPEG(empty_data, jpeg_in_file, true, decoded_data_dest, decoded_data_width, decoded_data_height, decoded_data_components);
+}
+
 
