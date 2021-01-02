@@ -5,6 +5,7 @@
 #include<glm/glm/glm.hpp>
 #include<vector>
 #include"Ray.h"
+#include"jpegfunc.h"
 
 struct Plant {
 	Plant(glm::vec3 po1, glm::vec3 po2, glm::vec3 po3, glm::vec3 norm)
@@ -29,22 +30,57 @@ public:
 		LEFT = backleft.y;
 		HIGH_MAX = 0;
 
-		int all_size = MAP_SIZE * MAP_SIZE;
-		FILE* fptr = NULL;
-		//cout << path << endl;
-		fptr = fopen(path, "r");
-		if (fptr == NULL)
-			return;
+		int row,col,channel;
+		vector<uint8_t> temp_high_uint;
+		readJPEG(path, temp_high_uint, row, col, channel);
 
-		//fread(HighMap, 1, all_size, fptr);
-		for (int i = 0; i < all_size; i++)//从matlab导出的灰度txt文件读入高度图
+		vector<float> temp_high_float;
+		for (int i=0;i<temp_high_uint.size();i++)
 		{
-			fscanf(fptr, "%f,", &HighMap[i]);
+			if (i % 3 == 0)
+			{
+				temp_high_float.push_back((float)temp_high_uint[i]);
+			}
 		}
-		fclose(fptr);
+		
+		vector<float> temp_high_fliter=fliter(temp_high_float);
+		
+		for (int i = 0; i < temp_high_fliter.size(); i++)
+		{
+			HighMap[i] = temp_high_fliter[i];
+		}
 
+	}
 
-
+	vector<float> fliter(vector<float > temp_high_float)
+	{
+		int row, col,mask_size=9;
+		int mask_half = (mask_size - 1) / 2;
+		float res_temp;
+		vector<float> res;
+		for (int i = 0; i < temp_high_float.size(); i++)
+		{
+			row = i / MAP_SIZE;
+			col = i % MAP_SIZE;
+			if (row < mask_half || col < mask_half || row >= MAP_SIZE - mask_half || col >= MAP_SIZE - mask_half)
+			{
+				res_temp = temp_high_float[i];
+			}
+			else
+			{
+				res_temp = 0;
+				for (int j = row - mask_half; j <= row + mask_half; j++)
+				{
+					for (int k = col - mask_half; k <= col + mask_half; k++)
+					{
+						res_temp += temp_high_float[j * MAP_SIZE + k];
+					}
+				}
+				res_temp = res_temp / (mask_size * mask_size);
+			}
+			res.push_back(res_temp);
+		}
+		return res;
 	}
 
 	float getHeight(float HighMap[], int px, int pz) {
@@ -61,7 +97,7 @@ public:
 			}
 		}
 
-		return y / 5; ///                              
+		return y / 6; ///                              
 	}
 
 	void getNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3& result) {
