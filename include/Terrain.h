@@ -5,19 +5,7 @@
 #include<glm/glm/glm.hpp>
 #include<vector>
 #include"Ray.h"
-#include"jpegfunc.h"
-
-struct Plant {
-	Plant(glm::vec3 po1, glm::vec3 po2, glm::vec3 po3, glm::vec3 norm)
-	{
-		this->p1 = po1;
-		this->p2 = po2;
-		this->p1 = po3;
-		this->Plant_normal = norm;
-	}
-	glm::vec3 p1, p2, p3, Plant_normal;
-};
-
+#include"jepgfunc.h"
 
 class Terrain
 {
@@ -30,21 +18,55 @@ public:
 		LEFT = backleft.y;
 		HIGH_MAX = 0;
 
-		int row,col,channel;
+		int row, col, channel;
 		vector<uint8_t> temp_high_uint;
 		readJPEG(path, temp_high_uint, row, col, channel);
 
 		vector<float> temp_high_float;
-		for (int i=0;i<temp_high_uint.size();i++)
+		for (int i = 0; i < temp_high_uint.size(); i++)
 		{
 			if (i % 3 == 0)
 			{
 				temp_high_float.push_back((float)temp_high_uint[i]);
 			}
 		}
-		
-		vector<float> temp_high_fliter=fliter(temp_high_float);
-		
+
+		vector<float> temp_high_fliter = fliter(temp_high_float);
+
+		for (int i = 0; i < temp_high_fliter.size(); i++)
+		{
+			HighMap[i] = temp_high_fliter[i];
+		}
+
+	}
+
+	void ChangeTerrain(const char* path, float* HighMap, int map_size, float step_size, glm::vec2 backleft)
+	{
+		MAP_SIZE = map_size;
+		STEP_SIZE = step_size;
+		BACK = backleft.x;
+		LEFT = backleft.y;
+		HIGH_MAX = 0;
+		vertics_index.clear();
+		vertics.clear();
+		normals.clear();
+		texCoords.clear();
+
+		int row, col, channel;
+		vector<uint8_t> temp_high_uint;
+		readJPEG(path, temp_high_uint, row, col, channel);
+
+		vector<float> temp_high_float;
+		for (int i = 0; i < temp_high_uint.size(); i++)
+		{
+			if (i % 3 == 0)
+			{
+				temp_high_float.push_back((float)temp_high_uint[i]);
+			}
+		}
+
+		vector<float> temp_high_fliter = fliter(temp_high_float);
+
 		for (int i = 0; i < temp_high_fliter.size(); i++)
 		{
 			HighMap[i] = temp_high_fliter[i];
@@ -54,7 +76,7 @@ public:
 
 	vector<float> fliter(vector<float > temp_high_float)
 	{
-		int row, col,mask_size=9;
+		int row, col, mask_size = 9;
 		int mask_half = (mask_size - 1) / 2;
 		float res_temp;
 		vector<float> res;
@@ -97,7 +119,7 @@ public:
 			}
 		}
 
-		return y / 6; ///                              
+		return y /6; ///                              
 	}
 
 	void getNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3& result) {
@@ -144,8 +166,6 @@ public:
 
 				glm::vec3 nor;
 				getNormal(p1, p2, p3, nor);
-				//Plant plant1(p1,p2,p3,nor);
-				//plants.push_back(plant1);
 
 				glm::vec3 p4;
 				p4.x = BACK + (j + 1) * STEP_SIZE;
@@ -154,8 +174,6 @@ public:
 
 				//p5=p3;p6=p2
 				getNormal(p4, p3, p2, nor);
-				//Plant plant2(p4, p3, p2, nor);
-				//plants.push_back(plant2);
 				//注意这里得到的是平面法向量，我们需要的是顶点法向量
 				vertics.push_back(p1);
 				vertics.push_back(p2);
@@ -459,7 +477,6 @@ public:
 	std::vector < glm::vec3 > vertics;//顶点信息
 	std::vector < glm::vec3 > normals;//法向量
 	std::vector < glm::vec2 > texCoords;//贴图
-	std::vector < Plant > plants;//网格平面
 };
 
 

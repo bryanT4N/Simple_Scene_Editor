@@ -35,6 +35,7 @@ public:
 	Model(GLchar* path)
 	{
 		this->loadModel(path);
+	
 	}
 
 	// Draws the model, and thus all its meshes
@@ -45,13 +46,21 @@ public:
 			this->meshes[i].Draw(shader);
 		}
 	}
+	string getModelName()
+	{
+		return this->modelName;
+	}
+	
 
 private:
 	/*  Model Data  */
 	vector<Mesh> meshes;
 	string directory;
 	vector<Texture> textures_loaded;
+	string modelName;
 
+
+	
 
 	/*  Functions   */
 	// Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -68,7 +77,7 @@ private:
 		}
 		// Retrieve the directory path of the filepath
 		this->directory = path.substr(0, path.find_last_of('\\'));
-
+		this->modelName = path.substr(path.find_last_of('\\')+1);
 		// Process ASSIMP's root node recursively
 		this->processNode(scene->mRootNode, scene);
 	}
@@ -98,7 +107,7 @@ private:
 		vector<Vertex> vertices;
 		vector<GLuint> indices;
 		vector<Texture> textures;
-
+	
 		// Walk through each of the mesh's vertices
 		for (GLuint i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -108,6 +117,7 @@ private:
 			vector.x = mesh->mVertices[i].x;
 			vector.y = mesh->mVertices[i].y;
 			vector.z = mesh->mVertices[i].z;
+			
 			vertex.Position = vector;
 			// Normals
 			vector.x = mesh->mNormals[i].x;
@@ -200,6 +210,7 @@ GLint TextureFromFile(const char* path, string directory)
 	//Generate texture ID and load texture data 
 	string filename = string(path);
 	filename =filename.substr(filename.find_last_of("\\")+1) ;
+	
 	filename = directory + '\\' + filename;
 	//cout << "loading:" << filename << endl;
 	GLuint textureID;

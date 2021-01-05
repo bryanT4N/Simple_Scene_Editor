@@ -1,7 +1,7 @@
 #include<iostream>
 #include"GetSelectFilePath.h"
 #include<string>
-#include<thread>
+//#include<thread>
 #include<glad/include/glad/glad.h>
 #include<GLFW/glfw3.h>
 //#include<myShader.h>
@@ -53,14 +53,18 @@ float mixValue = 0.1f;
 glm::vec2 bl(-50, -50);
 float HighMap[MAX_MAP * MAX_MAP];//地形图用的网格信息
 Terrain ourTerrain("../assets/terrain/1.jpg", HighMap, MAX_MAP, 0.1, bl);//构造地形图类
+float* highVertices;
+GLuint highVAO, highVBO;
 
 GLuint loadCubemap(vector<const GLchar*> faces);//这个是搞立方体贴图的
 
 //model
 ModelUnit model1;
-ModelsRender modelsRender; 
+ModelsRender modelsRender;
 
 GLuint cubemapTexture;
+GLuint groundTexture1;
+GLuint groundTexture2;
 
 void frame_buffer_callback(GLFWwindow* win, int width, int height)
 {
@@ -128,10 +132,65 @@ void loadskybox()
 	cubemapTexture = loadCubemap(faces);
 }
 
-int main()
-{	
+void changeTerrain()
+{
+	if (modelsRender.isCho())
+		return;
+	modelsRender.deletemodel();//换地形之后删除原有模型
+	cout << "Please select the terrain" << endl;
+	char* TerrainPath = GetSelectFilePath();
+	if ((string)TerrainPath == "")
+	{
+		ourTerrain.ChangeTerrain("../assets/terrain/1.jpg", HighMap, MAX_MAP, 0.1, bl);
+	}
+	else
+	{
+		ourTerrain.ChangeTerrain(TerrainPath, HighMap, MAX_MAP, 0.1, bl);
+	}
+	ourTerrain.putinVN(HighMap);
+	ourTerrain.putinPointNormal(HighMap);
+	highVertices = ourTerrain.mergeVN();
+
+	glBindVertexArray(highVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, highVBO);/**/
+	glBufferData(GL_ARRAY_BUFFER, 5 * ((ourTerrain.vertics).size()) * sizeof(float), highVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glBindVertexArray(0);
 	
-	cout << "Please choose the skybox file directory: \n";
+}
+
+void loadTerrianTex()
+{
+	cout << "Please select terrain's Texture1" << endl;
+	char* groundTexturePath1 = GetSelectFilePath();
+	if ((string)groundTexturePath1 == "")
+	{
+		groundTexture1 = loadTexture((GLchar*)"../assets/texture/1.jpg");
+	}
+	else
+	{
+		groundTexture1 = loadTexture((GLchar*)groundTexturePath1);
+	}
+	cout << "Please select terrain's Texture2" << endl;
+	char* groundTexturePath2 = GetSelectFilePath();
+	if ((string)groundTexturePath2 == "")
+	{
+		groundTexture1 = loadTexture((GLchar*)"../assets/texture/2.jpg");
+	}
+	else
+	{
+		groundTexture2 = loadTexture((GLchar*)groundTexturePath2);
+	}
+}
+
+
+int main()
+{
+
+//	cout << "Please choose the skybox file directory: \n";
 	char* skybox_path[6];
 	LoadSkyboxPath(skybox_path[0], skybox_path[1], skybox_path[2], skybox_path[3], skybox_path[4], skybox_path[5]);
 
@@ -164,6 +223,7 @@ int main()
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+
 	//part 1 end
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -182,7 +242,7 @@ int main()
 	//地形图处理
 	ourTerrain.putinVN(HighMap);
 	ourTerrain.putinPointNormal(HighMap);
-	float* highVertices = ourTerrain.mergeVN();
+	highVertices = ourTerrain.mergeVN();
 
 	float skyboxVertices[] = {
 		// positions          
@@ -230,7 +290,6 @@ int main()
 	};
 
 	//Setup 地形图
-	GLuint highVAO, highVBO;
 	glGenVertexArrays(1, &highVAO);
 	glGenBuffers(1, &highVBO);
 	glBindVertexArray(highVAO);
@@ -260,16 +319,12 @@ int main()
 		faces.push_back(skybox_path[i]);
 	}
 	cubemapTexture = loadCubemap(faces);
-
-	string groundTexturePath1 = "../assets/texture/1.jpg";
-	string groundTexturePath2 = "../assets/texture/3.jpg";
-	GLuint groundTexture1 = loadTexture((GLchar*)groundTexturePath1.c_str());
-	GLuint groundTexture2 = loadTexture((GLchar*)groundTexturePath2.c_str());
-
+	
+	loadTerrianTex();
 
 	//model
 	modelsRender.addShader(&ourshader);
-	
+	modelsRender.printMenu();
 	int i = 0, j = 0, k = 0;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -321,19 +376,16 @@ int main()
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, groundTexture1);
 		glUniform1i(glGetUniformLocation(highshader.ID, "u_Texture0"), 0);
-		
+
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, groundTexture2);
 		glUniform1i(glGetUniformLocation(highshader.ID, "u_Texture1"), 1);
 
 		glDrawArrays(GL_TRIANGLES, 0, (ourTerrain.vertics).size());
 		glBindVertexArray(0);
-
-
 		
 		modelsRender.render(camera);
-		
-	
+
 		//modelsRender.getModelFromUser();
 		// Swap the buffers
 		glfwSwapBuffers(window);
@@ -411,11 +463,6 @@ void Do_Movement()
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
-	if (keys[GLFW_KEY_L])
-		loadskybox();
-	
-		
-	
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -430,13 +477,85 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			keys[key] = true;
 		else if (action == GLFW_RELEASE)
 			keys[key] = false;
+		if (keys[GLFW_KEY_Y])
+			loadskybox();
+		if (keys[GLFW_KEY_R])
+			loadTerrianTex();
+		if (keys[GLFW_KEY_T])
+			changeTerrain();
+		if (keys[GLFW_KEY_J])
+			modelsRender.decreaseChoose();
+		if (keys[GLFW_KEY_K])
+			modelsRender.increaseChoose();
+		if (keys[GLFW_KEY_P])
+			modelsRender.printMenu();
+		if (keys[GLFW_KEY_L])
+			modelsRender.deleteModel();
+
+		if (keys[GLFW_KEY_E])
+			modelsRender.openChoose();
+		if (keys[GLFW_KEY_EQUAL])
+			modelsRender.expand();
+		if (keys[GLFW_KEY_MINUS])
+			modelsRender.narrow();
+		if (mode != GLFW_MOD_CONTROL && keys[GLFW_KEY_UP])
+		{
+			if (!modelsRender.isCho())
+				return;
+			glm::vec3 tmp = modelsRender.getTra();
+			tmp.z -= 0.1;
+			float y = ourTerrain.getAnyPlaceHeight(HighMap, tmp);
+			tmp.y = y;
+			modelsRender.translate(tmp);
+		}
+
+		if (mode != GLFW_MOD_CONTROL && keys[GLFW_KEY_DOWN])
+		{
+			if (!modelsRender.isCho())
+				return;
+			glm::vec3 tmp = modelsRender.getTra();
+			tmp.z += 0.1;
+			float y = ourTerrain.getAnyPlaceHeight(HighMap, tmp);
+			tmp.y = y;
+			modelsRender.translate(tmp);
+		}
+
+		if (mode != GLFW_MOD_CONTROL && keys[GLFW_KEY_RIGHT])
+		{
+			if (!modelsRender.isCho())
+				return;
+			glm::vec3 tmp = modelsRender.getTra();
+			tmp.x += 0.1;
+			float y = ourTerrain.getAnyPlaceHeight(HighMap, tmp);
+			tmp.y = y;
+			modelsRender.translate(tmp);
+		}
+
+		if (mode != GLFW_MOD_CONTROL && keys[GLFW_KEY_LEFT])
+		{
+			if (!modelsRender.isCho())
+				return;
+			glm::vec3 tmp = modelsRender.getTra();
+			tmp.x -= 0.1;
+			float y = ourTerrain.getAnyPlaceHeight(HighMap, tmp);
+			tmp.y = y;
+			modelsRender.translate(tmp);
+		}
+		if (mode == GLFW_MOD_CONTROL && keys[GLFW_KEY_LEFT])
+			modelsRender.leftRot();
+		if (mode == GLFW_MOD_CONTROL && keys[GLFW_KEY_RIGHT])
+			modelsRender.rightRot();
+		if (mode == GLFW_MOD_CONTROL && keys[GLFW_KEY_UP])
+			modelsRender.upRot();
+		if (mode == GLFW_MOD_CONTROL && keys[GLFW_KEY_DOWN])
+			modelsRender.downRot();
 	}
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_Bit) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		
+
 		mouse_button_left_pressed = 1;
 		//鼠标左键按下，开始检测交点并放置模型
 		//string path;
@@ -447,20 +566,23 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_
 		bool ishit = ourTerrain.Intersects(HighMap, ray1, hit);
 		if (ishit)
 		{
-			cout << "[" << hit.x << "," << hit.y << "," << hit.z << "]" << endl;
-			cout << "Please choose the model's obj file: \n";
+			//cout << "[" << hit.x << "," << hit.y << "," << hit.z << "]" << endl;
+		//	cout << "Please choose the model's obj file: \n";
 			char* model_path = GetSelectFilePath();
 			if ((string)model_path == "")
 			{
 				return;
 			}
-			
+
 			Model ourModel1((GLchar*)model_path);
 			model1.model = ourModel1;
 			model1.translate = hit;//+glm::vec3(0,0.5,0)
-			cout << "Please choose the scale of model ( x_scale , y_scale , z_scale ): \n";
+			//cout << "Please choose the scale of model : \n";
 			float x_scale, y_scale, z_scale;
-			cin>> x_scale >> y_scale >> z_scale;
+			//cin >> x_scale;
+			x_scale = 1.0;
+			y_scale = x_scale;
+			z_scale = x_scale;
 			glm::vec3 scale_input(x_scale, y_scale, z_scale);
 			model1.scale = scale_input;
 			modelsRender.addModel(model1);
@@ -481,6 +603,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods_
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+
+	//std::cout << "(pos:" << xpos << "," << ypos << ")" << std::endl;
 	if (firstMouse)
 	{
 		lastX = xpos;

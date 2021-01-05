@@ -4,9 +4,12 @@ layout (location = 1) in vec3 Normals;
 
 out vec3 FragPos;
 out vec3 normal;
+
+
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+
 
 void main()
 {

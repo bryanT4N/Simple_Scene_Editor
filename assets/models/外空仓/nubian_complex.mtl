@@ -1,0 +1,29 @@
+newmtl material_1
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Km 0
+map_Kd structure_mtl1_diffcol.jpg
+
+newmtl material_1_windows
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Km 0
+map_Kd windows_mtl1_diffcol.jpg
+
+newmtl material_1_floor
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Km 0
+

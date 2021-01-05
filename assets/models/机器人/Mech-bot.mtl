@@ -1,0 +1,14 @@
+# Blender MTL File: 'Mech-bot.blend'
+# Material Count: 1
+
+newmtl ac3dmat1
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.289097 0.481100 0.274532
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Ks PaintWork_Blue.png
+map_Kd PaintWork Red.png

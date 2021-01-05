@@ -1,0 +1,14 @@
+#
+# pug.mtl
+#
+
+newmtl PUG_TAN
+illum 2
+Kd 1.000000 1.000000 1.000000
+Ka 0.250000 0.250000 0.250000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ns 0.000000
+map_Kd texture_diffuse.jpg
+map_Ks texture_specular.jpg
+

@@ -17,13 +17,9 @@ struct Light {
 in vec3 FragPos;  
 in vec3 Normal;  
 in vec2 TexCoords;
-  
+in float flag;  
 uniform vec3 viewPos;
 uniform Light light;
-
-
-
-
 
 
 void main()
@@ -45,6 +41,14 @@ void main()
     vec3 specular = light.specular * spec * texture(texture_specular, TexCoords).rgb;  
         
     vec3 result = ambient + diffuse + specular;
+	
+	if(flag>0)
+	{
+		
+		result=mix(result,vec3(1.0f,1.0f,1.0f),0.6);
+	}
+
+	
     FragColor = vec4(result, 1.0);
 } 	
 
