@@ -51,7 +51,7 @@ std::string GetSelectFilePath_string()
 	if (GetOpenFileName(&open))  // 显示打开选择文件对话框。  
 		path = file;
 	else {
-		std::cout << "没有选择文件。\n\n";
+		std::cout << "No file selected.\n";
 		return FilePath;
 	}
 	FilePath = path.GetBuffer(0);
@@ -90,7 +90,7 @@ std::string GetSelectFolderPath_string()
 		}
 	}
 	else {
-		std::cout << "没有选择文件夹。\n\n";
+		std::cout << "No directory selected.\n";
 		return FolderPath;
 	}
 

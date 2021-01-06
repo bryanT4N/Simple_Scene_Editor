@@ -103,6 +103,7 @@ void LoadSkyboxPath(char*& right_path, char*& left_path, char*& top_path, char*&
 	if (sky_path_str == "")
 	{
 		sky_path_str = "../assets/skybox/sky5";
+		cout << "Using default skybox.\n\n";
 	}
 	string tmp_path;
 	tmp_path = sky_path_str + "\\right.jpg";
@@ -137,11 +138,12 @@ void changeTerrain()
 	if (modelsRender.isCho())
 		return;
 	modelsRender.deletemodel();//换地形之后删除原有模型
-	cout << "Please select the terrain" << endl;
+	cout << "Please select the terrain: " << endl;
 	char* TerrainPath = GetSelectFilePath();
 	if ((string)TerrainPath == "")
 	{
 		ourTerrain.ChangeTerrain("../assets/terrain/1.jpg", HighMap, MAX_MAP, 0.1, bl);
+		cout << "Using default terrain.\n\n";
 	}
 	else
 	{
@@ -164,21 +166,23 @@ void changeTerrain()
 
 void loadTerrianTex()
 {
-	cout << "Please select terrain's Texture1" << endl;
+	cout << "Please select terrain's Texture1: " << endl;
 	char* groundTexturePath1 = GetSelectFilePath();
 	if ((string)groundTexturePath1 == "")
 	{
 		groundTexture1 = loadTexture((GLchar*)"../assets/texture/1.jpg");
+		cout << "Using default texture.\n\n";
 	}
 	else
 	{
 		groundTexture1 = loadTexture((GLchar*)groundTexturePath1);
 	}
-	cout << "Please select terrain's Texture2" << endl;
+	cout << "Please select terrain's Texture2: " << endl;
 	char* groundTexturePath2 = GetSelectFilePath();
 	if ((string)groundTexturePath2 == "")
 	{
 		groundTexture1 = loadTexture((GLchar*)"../assets/texture/2.jpg");
+		cout << "Using default texture.\n\n";
 	}
 	else
 	{
@@ -189,8 +193,7 @@ void loadTerrianTex()
 
 int main()
 {
-
-//	cout << "Please choose the skybox file directory: \n";
+	cout << "Please choose skybox's file directory: \n";
 	char* skybox_path[6];
 	LoadSkyboxPath(skybox_path[0], skybox_path[1], skybox_path[2], skybox_path[3], skybox_path[4], skybox_path[5]);
 
@@ -207,7 +210,7 @@ int main()
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Scene Editor V0.1", NULL, NULL);
 	if (window == NULL)
 	{
-		std::cout << "Fail to create" << std::endl;
+		std::cout << "Failed to create." << std::endl;
 		glfwTerminate();
 		return -1;
 	}//create window
@@ -215,7 +218,7 @@ int main()
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))//
 	{
-		std::cout << "fail to initialize glad" << std::endl;
+		std::cout << "Fail to initialize glad." << std::endl;
 		return -1;
 	}
 	glfwSetFramebufferSizeCallback(window, frame_buffer_callback);
@@ -324,6 +327,7 @@ int main()
 
 	//model
 	modelsRender.addShader(&ourshader);
+	system("cls");
 	modelsRender.printMenu();
 	int i = 0, j = 0, k = 0;
 	while (!glfwWindowShouldClose(window))

@@ -58,13 +58,13 @@ public:
 
     // Constructor with vectors
 
-    Camera(glm::vec3 position = glm::vec3(0.0f, 30.0f, 30.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 world_center = glm::vec3(0.0f, 0.0f, 0.0f), GLfloat yaw = YAW, GLfloat pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
+    Camera(glm::vec3 position = glm::vec3(0.0f, 60.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 world_center = glm::vec3(0.0f, 0.0f, 0.0f), GLfloat yaw = YAW, GLfloat pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
     {
         this->Position = position;
         this->Camera_World_Center = world_center;
         this->WorldUp = up;
         this->Yaw = yaw;
-        this->Pitch = -45.0f;
+        this->Pitch = -89.0f;
         this->updateCameraVectorsUsingEulerAngle();
     }
     // Constructor with scalar values
@@ -117,12 +117,12 @@ public:
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(GLfloat yoffset)
     {
-        if (this->Zoom >= 1.0f && this->Zoom <= 150.0f)
+        if (this->Zoom >= 1.0f && this->Zoom <= 100.0f)
             this->Zoom -= ZOOM_SPEED * yoffset;
         if (this->Zoom <= 1.0f)
             this->Zoom = 1.0f;
-        if (this->Zoom >= 150.0f)
-            this->Zoom = 150.0f;
+        if (this->Zoom >= 100.0f)
+            this->Zoom = 100.0f;
     }
 
 
